@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>Telegram Image Hosting</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Telegram Upload</h1>
+    <form id="uploadForm">
+      <div class="file-select-row">
+        <button type="button" id="fileSelectBtn" class="file-select-btn">Choose File</button>
+        <div id="fileSelectBox" class="file-select-box file-unselected">No file selected</div>
+        <button type="button" id="uploadBtn" class="btn upload-btn">Upload</button>
+      </div>
+      <input type="file" id="fileInput" name="file" required style="display:none;" />
+      <div id="dropZone" class="drop-zone">Drag and drop files here</div>
+    </form>
+    <div id="result" class="result-box"></div>
+    <h2>Uploaded Files</h2>
+    <table id="filesTable" class="files-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Filename</th>
+          <th>Preview</th>
+          <th>Year</th>
+          <th>Month</th>
+          <th>Day</th>
+          <th>UUID</th>
+          <th>CustomUrl</th>
+          <th>Upload Time</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Rows will be dynamically populated -->
+      </tbody>
+    </table>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

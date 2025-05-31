@@ -1,0 +1,24 @@
+[package]
+name = "rusty_img_hosting"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+name = "rusty_img_hosting"
+path = "src/lib.rs"
+
+[dependencies]
+actix-web = "4"
+dotenv = "0.15.0"
+env_logger = "0.11.8"
+log = "0.4.27"
+reqwest = { version = "0.12.15" , features = ["json", "multipart", "blocking"] }
+rusqlite = { version = "0.31.0", features = ["bundled"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0.140"
+tokio = { version = "1", features = ["full"] }
+chrono = { version = "0.4", features = ["serde"] }
+actix-multipart = "0.7.2"
+futures-util = "0.3.31"
+uuid = { version = "1.17.0", features = ["v4"] }
+actix-cors = "0.7.1"

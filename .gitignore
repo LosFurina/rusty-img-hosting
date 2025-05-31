@@ -1,0 +1,24 @@
+# Rust
+/target/
+**/*.rs.bk
+**/*.swp
+**/*.swo
+Cargo.lock
+# VSCode
+.vscode/
+# SQLite DB
+*.db
+# dotenv
+.env
+# Logs
+*.log
+# OS
+.DS_Store
+Thumbs.db
+# Node/Web
+/public/*.js
+/public/*.css
+/public/*.map
+# Misc
+*.tmp
+*.bak
