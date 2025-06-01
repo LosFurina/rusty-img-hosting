@@ -93,7 +93,7 @@ async function fetchFiles() {
       btn.addEventListener('click', async function() {
         const id = this.getAttribute('data-id');
         if (confirm('Are you sure you want to delete this file?')) {
-          const res = await fetch(`${custom_url}/files/${id}`, { method: 'DELETE' });
+          const res = await fetch(`${custom_url}/del/${id}`, { method: 'DELETE' });
           if (res.ok) fetchFiles();
           else alert('Delete failed');
         }
