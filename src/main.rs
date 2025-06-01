@@ -85,7 +85,7 @@ async fn upload_file(mut payload: Multipart) -> impl Responder {
                                 "file_id": res.file_id,
                                 "message_id": res.message_id,
                                 "url": res.file_url,
-                                "row_id": row_id
+                                "row_id": row_id,
                             }));
                         }
                     }
@@ -117,7 +117,7 @@ async fn get_files() -> impl Responder {
 }
 
 #[get("/find/{year}/{month}/{day}/{uuid}")]
-async fn find_file_record(path: actix_web::web::Path<(u32, u32, u32, String)>) -> impl Responder {
+async fn get_file(path: actix_web::web::Path<(u32, u32, u32, String)>) -> impl Responder {
     let (year, month, day, uuid) = path.into_inner();
 
     let db = Database::new("db.db");
@@ -137,11 +137,11 @@ async fn find_file_record(path: actix_web::web::Path<(u32, u32, u32, String)>) -
     }
 }
 
-#[delete("/files/{file_id}")]
+#[delete("/del/{file_id}")]
 async fn delete_file(path: actix_web::web::Path<i64>) -> impl Responder {
     let file_id = path.into_inner();
 
-    println!("[DEBUG] Try to delete file_id: {}", file_id);
+    debug!("Try to delete file_id: {}", file_id);
 
     let db = Database::new("db.db");
     db.init_db().unwrap();
@@ -225,7 +225,7 @@ async fn main() -> std::io::Result<()> {
             .service(get_updates)
             .service(upload_file)
             .service(get_files)
-            .service(find_file_record)
+            .service(get_file)
             .service(delete_file)
     })
     .bind(("127.0.0.1", 8000))?

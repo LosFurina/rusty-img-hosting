@@ -14,7 +14,6 @@ pub struct FileRecord {
     pub month: u32,
     pub day: u32,
     pub uuid: String,
-    pub custom_url: String,
     pub upload_time: Option<String>,
 }
 
@@ -30,22 +29,6 @@ impl FileRecord {
         file_id: String,
         message_id: String,
     ) -> Self {
-        dotenv().ok();
-        let protocol = dotenv::var("PROTOCOL").unwrap_or("http".to_string());
-        let custom_domain = dotenv::var("CUSTOM_DOMAIN").unwrap_or("localhost".to_string());
-        let custom_port = dotenv::var("CUSTOM_PORT").unwrap_or_else(|_| {
-            if protocol == "http" {
-                "80".to_string()
-            } else if protocol == "https" {
-                "443".to_string()
-            } else {
-                panic!("Unsupported protocol in environment variables")
-            }
-        });
-        let custom_url = format!(
-            "{}://{}:{}/{}/{}/{}/{}",
-            protocol, custom_domain, custom_port, year, month, day, uuid
-        );
         Self {
             id: None,
             filename,
@@ -56,7 +39,6 @@ impl FileRecord {
             month,
             day,
             uuid,
-            custom_url: custom_url.clone(),
             upload_time: None,
         }
     }
@@ -73,7 +55,6 @@ impl FileRecord {
             month: row.get("month")?,
             day: row.get("day")?,
             uuid: row.get("uuid")?,
-            custom_url: row.get("custom_url")?,
             upload_time: row.get("upload_time")?,
         })
     }
