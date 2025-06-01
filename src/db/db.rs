@@ -1,4 +1,5 @@
 use super::models::FileRecord;
+use dotenv::dotenv;
 use log::{debug, error, info};
 use rusqlite::{Connection, Result};
 use std::path::Path;
@@ -37,7 +38,6 @@ impl Database {
                 month INTEGER,
                 day INTEGER,
                 uuid TEXT NOT NULL,
-                custom_url TEXT,
                 upload_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )",
             [],
@@ -50,8 +50,8 @@ impl Database {
     pub fn insert_file(&self, new_file: FileRecord) -> Result<i64> {
         let conn = Connection::open(&self.db_path)?;
         conn.execute(
-            "INSERT INTO files (filename, file_id, message_id, url, year, month, day, uuid, custom_url) 
-             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)",
+            "INSERT INTO files (filename, file_id, message_id, url, year, month, day, uuid)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
             rusqlite::params![
                 new_file.filename,
                 new_file.file_id,
@@ -61,7 +61,6 @@ impl Database {
                 new_file.month,
                 new_file.day,
                 new_file.uuid,
-                new_file.custom_url,
             ],
         )?;
         Ok(conn.last_insert_rowid())
@@ -72,8 +71,9 @@ impl Database {
         let rows = stmt.query_map([], |row| FileRecord::from_row(row))?;
 
         let mut records = Vec::new();
-        for row in rows {
-            records.push(row.expect("Failed to map row to FileRecord"));
+        for record in rows {
+            let record = record.expect("Failed to map row to FileRecord");
+            records.push(record);
         }
         Ok(records)
     }
@@ -182,7 +182,7 @@ mod tests {
 
     #[test]
     fn test_get_all_records() {
-        let db = Database::new("db.db");
+        let db = Database::new("test_files.db");
         db.init_db().unwrap();
         let records = db.get_all_records().unwrap();
         assert!(!records.is_empty());
