@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+  img-hosting:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: img-hosting
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
