@@ -14,3 +14,4 @@ COPY target/release /app
 EXPOSE 8080
 # Run the application
 CMD ["/app/rusty_img_hosting", ">> /tmp/logs/rusty_img_hosting.log 2>&1 &"]
+CMD ["nginx"]
