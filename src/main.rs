@@ -2,7 +2,6 @@ use actix_cors::Cors;
 use actix_multipart::Multipart;
 use actix_web::{App, HttpResponse, HttpServer, Responder, delete, get, post};
 use db::FileRecord;
-use dotenv::dotenv;
 use futures_util::StreamExt as _;
 use reqwest;
 use std::env;
@@ -10,7 +9,10 @@ use telegram::Bot;
 mod telegram;
 use telegram::api::TelegramBot;
 mod db;
+use actix_files::NamedFile;
+use actix_web::web;
 use chrono::Datelike;
+use clap::{Arg, Command};
 use db::db::Database;
 use log::{debug, error, info, warn};
 
@@ -212,14 +214,58 @@ async fn main() -> std::io::Result<()> {
     unsafe {
         std::env::set_var("RUST_LOG", "debug");
     }
-    dotenv().ok();
     env_logger::init();
+
+    // Parse command line arguments using clap
+    let matches = Command::new("rusty-img-hosting")
+        .version("1.0")
+        .about("A simple image hosting server")
+        .arg(
+            Arg::new("config")
+                .short('c')
+                .long("config")
+                .num_args(1)
+                .default_value("config.toml")
+                .help("Sets a custom config file"),
+        )
+        .get_matches();
+
+    let config_path = matches.get_one::<String>("config").unwrap();
+    info!("Using config file: {}", config_path);
+
+    let config_content = std::fs::read_to_string(config_path).expect("Failed to read config file");
+    let config: toml::Value = toml::from_str(&config_content).expect("Failed to parse config file");
+    info!("Loaded config: {:?}", config);
+    if let Some(v) = config.get("TG_BOT_TOKEN") {
+        info!("TG_BOT_TOKEN is set in the config file");
+        unsafe {
+            env::set_var("TG_BOT_TOKEN", v.as_str().unwrap());
+        }
+    }
+    if let Some(v) = config.get("TG_CHAT_ID") {
+        info!("TG_CHAT_ID is set in the config file");
+        unsafe {
+            env::set_var("TG_CHAT_ID", v.as_str().unwrap());
+        }
+    }
+
+    let custom_port = config
+        .get("PORT")
+        .and_then(|v| v.as_integer())
+        .unwrap_or(8000) as u16;
+
+    let custom_listen_address = config
+        .get("LISTEN_ADDRESS")
+        .and_then(|v| v.as_str())
+        .unwrap_or("0.0.0.0");
+
     HttpServer::new(|| {
         let cors = Cors::default()
             .allow_any_origin()
             .allowed_methods(vec!["GET", "POST", "DELETE"])
             .allowed_headers(vec![actix_web::http::header::CONTENT_TYPE])
             .supports_credentials();
+
         App::new()
             .wrap(cors)
             .service(get_updates)
@@ -227,8 +273,10 @@ async fn main() -> std::io::Result<()> {
             .service(get_files)
             .service(get_file)
             .service(delete_file)
+            // Serve static files (js, css, etc.) from src/public/ as the last fallback
+            .service(actix_files::Files::new("/", "src/public").index_file("index.html"))
     })
-    .bind(("0.0.0.0", 8000))?
+    .bind((custom_listen_address, custom_port))?
     .run()
     .await
 }
