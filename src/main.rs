@@ -225,7 +225,6 @@ async fn main() -> std::io::Result<()> {
                 .short('c')
                 .long("config")
                 .num_args(1)
-                .default_value("config.toml")
                 .help("Sets a custom config file"),
         )
         .get_matches();
