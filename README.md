@@ -58,7 +58,7 @@ TG_CHAT_ID=your_telegram_chat_id
 ## Notes
 - Requires a running Telegram bot and chat.
 - The SQLite database file is `db.db` by default.
-- Logging is enabled at debug level.
+- Logging is enabled at debug level
 
 ## License
 MIT
